@@ -1,0 +1,247 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		2369834E176CA73B009F46B0 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2369834D176CA73B009F46B0 /* Foundation.framework */; };
+		23698353176CA73B009F46B0 /* KeepaliveInBg.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 23698352176CA73B009F46B0 /* KeepaliveInBg.h */; };
+		23698355176CA73B009F46B0 /* KeepaliveInBg.m in Sources */ = {isa = PBXBuildFile; fileRef = 23698354176CA73B009F46B0 /* KeepaliveInBg.m */; };
+		23698364176CA821009F46B0 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 23698363176CA821009F46B0 /* AVFoundation.framework */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		23698348176CA73B009F46B0 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "include/${PRODUCT_NAME}";
+			dstSubfolderSpec = 16;
+			files = (
+				23698353176CA73B009F46B0 /* KeepaliveInBg.h in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		2369834A176CA73B009F46B0 /* libKeepaliveInBg.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libKeepaliveInBg.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		2369834D176CA73B009F46B0 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		23698351176CA73B009F46B0 /* KeepaliveInBg-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "KeepaliveInBg-Prefix.pch"; sourceTree = "<group>"; };
+		23698352176CA73B009F46B0 /* KeepaliveInBg.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = KeepaliveInBg.h; sourceTree = "<group>"; };
+		23698354176CA73B009F46B0 /* KeepaliveInBg.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = KeepaliveInBg.m; sourceTree = "<group>"; };
+		23698363176CA821009F46B0 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		23698347176CA73B009F46B0 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				23698364176CA821009F46B0 /* AVFoundation.framework in Frameworks */,
+				2369834E176CA73B009F46B0 /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		2369833F176CA73B009F46B0 = {
+			isa = PBXGroup;
+			children = (
+				2369834F176CA73B009F46B0 /* KeepaliveInBg */,
+				2369834C176CA73B009F46B0 /* Frameworks */,
+				2369834B176CA73B009F46B0 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		2369834B176CA73B009F46B0 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				2369834A176CA73B009F46B0 /* libKeepaliveInBg.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		2369834C176CA73B009F46B0 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				23698363176CA821009F46B0 /* AVFoundation.framework */,
+				2369834D176CA73B009F46B0 /* Foundation.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		2369834F176CA73B009F46B0 /* KeepaliveInBg */ = {
+			isa = PBXGroup;
+			children = (
+				23698352176CA73B009F46B0 /* KeepaliveInBg.h */,
+				23698354176CA73B009F46B0 /* KeepaliveInBg.m */,
+				23698350176CA73B009F46B0 /* Supporting Files */,
+			);
+			path = KeepaliveInBg;
+			sourceTree = "<group>";
+		};
+		23698350176CA73B009F46B0 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				23698351176CA73B009F46B0 /* KeepaliveInBg-Prefix.pch */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		23698349176CA73B009F46B0 /* KeepaliveInBg */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 23698358176CA73B009F46B0 /* Build configuration list for PBXNativeTarget "KeepaliveInBg" */;
+			buildPhases = (
+				23698346176CA73B009F46B0 /* Sources */,
+				23698347176CA73B009F46B0 /* Frameworks */,
+				23698348176CA73B009F46B0 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = KeepaliveInBg;
+			productName = KeepaliveInBg;
+			productReference = 2369834A176CA73B009F46B0 /* libKeepaliveInBg.a */;
+			productType = "com.apple.product-type.library.static";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		23698341176CA73B009F46B0 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0450;
+			};
+			buildConfigurationList = 23698344176CA73B009F46B0 /* Build configuration list for PBXProject "KeepaliveInBg" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = 2369833F176CA73B009F46B0;
+			productRefGroup = 2369834B176CA73B009F46B0 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				23698349176CA73B009F46B0 /* KeepaliveInBg */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		23698346176CA73B009F46B0 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				23698355176CA73B009F46B0 /* KeepaliveInBg.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		23698356176CA73B009F46B0 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 6.0;
+				SDKROOT = iphoneos;
+			};
+			name = Debug;
+		};
+		23698357176CA73B009F46B0 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 6.0;
+				SDKROOT = iphoneos;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		23698359176CA73B009F46B0 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				DSTROOT = /tmp/KeepaliveInBg.dst;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "KeepaliveInBg/KeepaliveInBg-Prefix.pch";
+				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+			};
+			name = Debug;
+		};
+		2369835A176CA73B009F46B0 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				DSTROOT = /tmp/KeepaliveInBg.dst;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "KeepaliveInBg/KeepaliveInBg-Prefix.pch";
+				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		23698344176CA73B009F46B0 /* Build configuration list for PBXProject "KeepaliveInBg" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				23698356176CA73B009F46B0 /* Debug */,
+				23698357176CA73B009F46B0 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		23698358176CA73B009F46B0 /* Build configuration list for PBXNativeTarget "KeepaliveInBg" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				23698359176CA73B009F46B0 /* Debug */,
+				2369835A176CA73B009F46B0 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 23698341176CA73B009F46B0 /* Project object */;
+}
