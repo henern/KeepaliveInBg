@@ -8,10 +8,14 @@
 
 #import "KeepaliveInBg.h"
 #import <AVFoundation/AVAudioSession.h>
-#import <AVFoundation/AVPlayer.h>
-#import <AVFoundation/AVPlayerItem.h>
+#import <AudioToolbox/AudioSession.h>
 #import <AVFoundation/AVAudioPlayer.h>
 #import <UIKit/UIKit.h>
+
+NSString * const KeepaliveInBgWillBeginNotification     = @"KeepaliveInBgWillBeginNotification";
+NSString * const KeepaliveInBgDidEndNotification        = @"KeepaliveInBgDidEndNotification";
+NSString * const kBackgroundModes       = @"UIBackgroundModes";
+NSString * const bgModeAudio            = @"audio";
 
 #define instAUDIOSession        ((AVAudioSession *)[AVAudioSession sharedInstance])
 #define instAPP                 ([UIApplication sharedApplication])
@@ -71,15 +75,62 @@ KeepaliveInBg *g_instKeepalive = nil;
     {
         _enabled = [self _doSetup];
     }
-    else
+    
+    if (!_enabled)
     {
         [self _doCleanUp];
     }
 }
 
+- (BOOL)isInBackground
+{
+    return self.player.isPlaying;
+}
+
 #pragma mark private
+- (BOOL)_checkConfig
+{
+    // check if the audio file exist
+    if (![self _path4mutedAudio])
+    {
+        return NO;
+    }
+    
+    // check if the config of app is correct!
+    NSArray *modes = [[[NSBundle mainBundle] infoDictionary] objectForKey:kBackgroundModes];
+    if (!modes ||
+        ![modes isKindOfClass:[NSArray class]] ||
+        [modes count] == 0)
+    {
+        return NO;
+    }
+    
+    for (NSString *iter in modes)
+    {
+        if (iter &&
+            [iter isKindOfClass:[NSString class]] &&
+            [iter isEqualToString:bgModeAudio])
+        {
+            return YES;
+        }
+    }
+    
+    return NO;
+}
+
+- (NSString*)_path4mutedAudio
+{
+    return [[NSBundle mainBundle] pathForResource:@"detum" ofType:@"dat"];      // muted.dat ==> detum.dat
+}
+
 - (BOOL)_doSetup
 {
+    if (![self _checkConfig])
+    {
+        NSAssert(0, @"Invalid Config!");
+        return NO;
+    }
+    
     if (self.player)
     {
         return YES;
@@ -106,7 +157,7 @@ KeepaliveInBg *g_instKeepalive = nil;
     
     // create the player
     {
-        NSString *path = [[NSBundle mainBundle] pathForResource:@"Usher" ofType:@"mp3"];
+        NSString *path = [self _path4mutedAudio];
         self.player = [[AVAudioPlayer alloc] initWithContentsOfURL:[NSURL URLWithString:path]
                                                              error:nil];
         self.player.numberOfLoops = -1;
@@ -125,22 +176,21 @@ KeepaliveInBg *g_instKeepalive = nil;
 }
 
 - (void)_start
-{
-    if (instAUDIOSession.delegate == self)
-    {
-        return;
-    }
-    
-    if (instAUDIOSession.delegate)
+{    
+    if (instAUDIOSession.delegate &&
+        instAUDIOSession.delegate != self)
     {
         // FAIL because it's hooked by another code
         NSAssert(0, @"ERROR");
         return;
     }
     
-    if (self.enabled && self.player)
+    if (self.enabled && !self.player.isPlaying)
     {
         KIBLOG(@"[_start]");
+        [[NSNotificationCenter defaultCenter] postNotificationName:KeepaliveInBgWillBeginNotification
+                                                            object:self
+                                                          userInfo:nil];
         
         // monitor audio session
         instAUDIOSession.delegate = self;
@@ -149,6 +199,7 @@ KeepaliveInBg *g_instKeepalive = nil;
         NSError *err = nil;
         _oldAudioCategory = instAUDIOSession.category;
         [instAUDIOSession setCategory:AVAudioSessionCategoryPlayback error:&err];
+        [self _enableMixed];
         
         // play it
         [self.player play];
@@ -157,12 +208,8 @@ KeepaliveInBg *g_instKeepalive = nil;
 
 - (void)_stop
 {
+    [self _disableMixed];
     instAUDIOSession.delegate = nil;
-    if (self.player.isPlaying)
-    {
-        KIBLOG(@"[_stop]");
-        [self.player stop];
-    }
     
     if (_oldAudioCategory)
     {
@@ -170,6 +217,28 @@ KeepaliveInBg *g_instKeepalive = nil;
         [instAUDIOSession setCategory:_oldAudioCategory error:&err];
         _oldAudioCategory = nil;
     }
+    
+    if (self.player.isPlaying)
+    {
+        KIBLOG(@"[_stop]");
+        [self.player stop];
+        
+        [[NSNotificationCenter defaultCenter] postNotificationName:KeepaliveInBgDidEndNotification
+                                                            object:self
+                                                          userInfo:nil];
+    }
+}
+
+- (void)_enableMixed
+{
+    UInt32 property = TRUE;
+    AudioSessionSetProperty(kAudioSessionProperty_OverrideCategoryMixWithOthers, sizeof(property), &property);
+}
+
+- (void)_disableMixed
+{
+    UInt32 property = FALSE;
+    AudioSessionSetProperty(kAudioSessionProperty_OverrideCategoryMixWithOthers, sizeof(property), &property);
 }
 
 #pragma mark UIApplication notifications
@@ -204,6 +273,11 @@ KeepaliveInBg *g_instKeepalive = nil;
 - (void)endInterruptionWithFlags:(NSUInteger)flags
 {
     KIBLOG(@"[endInterruptionWithFlags]");
+    
+    if (instAPP.applicationState != UIApplicationStateActive)
+    {
+        [self _start];
+    }
 }
 
 @end
