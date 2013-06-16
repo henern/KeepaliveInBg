@@ -3,7 +3,7 @@
 //  KeepaliveInBg
 //
 //  Created by Wayne W on 13-6-15.
-//
+//  https://github.com/henern
 //
 
 #import "KeepaliveInBg.h"
@@ -20,9 +20,9 @@ NSString * const bgModeAudio            = @"audio";
 #define instAUDIOSession        ((AVAudioSession *)[AVAudioSession sharedInstance])
 #define instAPP                 ([UIApplication sharedApplication])
 #ifdef DEBUG
-#define KIBLOG(x)       NSLog(x)
+#define KIBLOG(...)       NSLog(__VA_ARGS__)
 #else
-#define KIBLOG(x)
+#define KIBLOG(...)
 #endif
 
 NSString * const kPlayerStatus      = @"status";
@@ -32,6 +32,7 @@ KeepaliveInBg *g_instKeepalive = nil;
 @interface KeepaliveInBg () <AVAudioSessionDelegate>
 {
     NSString *_oldAudioCategory;
+    UIBackgroundTaskIdentifier _bgtID;
 }
 
 @property (nonatomic, strong) AVAudioPlayer *player;
@@ -61,7 +62,7 @@ KeepaliveInBg *g_instKeepalive = nil;
     self = [super init];
     if (self)
     {
-
+        _bgtID = UIBackgroundTaskInvalid;
     }
     
     return self;
@@ -210,6 +211,7 @@ KeepaliveInBg *g_instKeepalive = nil;
 {
     [self _disableMixed];
     instAUDIOSession.delegate = nil;
+    [self _closeBackgroundTask];
     
     if (_oldAudioCategory)
     {
@@ -241,6 +243,19 @@ KeepaliveInBg *g_instKeepalive = nil;
     AudioSessionSetProperty(kAudioSessionProperty_OverrideCategoryMixWithOthers, sizeof(property), &property);
 }
 
+- (void)_closeBackgroundTask
+{
+    if (UIBackgroundTaskInvalid != _bgtID)
+    {
+        KIBLOG(@"%s, background-task-id:%u", __FUNCTION__, (NSUInteger)_bgtID);
+        
+        [instAPP endBackgroundTask:_bgtID];
+        _bgtID = UIBackgroundTaskInvalid;
+    }
+    
+    NSAssert(UIBackgroundTaskInvalid == _bgtID, @"ERROR");
+}
+
 #pragma mark UIApplication notifications
 - (void)_appBecameActive:(NSNotification*)notify
 {
@@ -256,11 +271,21 @@ KeepaliveInBg *g_instKeepalive = nil;
 
 - (void)_appDidBackground:(NSNotification*)notify
 {
-    __block UIBackgroundTaskIdentifier bgtID = 0;
-    bgtID = [instAPP beginBackgroundTaskWithExpirationHandler:^{
+    NSAssert(UIBackgroundTaskInvalid == _bgtID, @"ERROR");
+    [self _closeBackgroundTask];
+    
+    if (!self.enabled)
+    {
+        return;
+    }
+    
+    _bgtID = [instAPP beginBackgroundTaskWithExpirationHandler:^{
         KIBLOG(@"[beginBackgroundTaskWithExpirationHandler]");
-        [instAPP endBackgroundTask:bgtID];
+        
+        [self _closeBackgroundTask];
     }];
+    
+    KIBLOG(@"%s, background-task-id:%u", __FUNCTION__, (NSUInteger)_bgtID);
 }
 
 #pragma mark AVAudioSession
