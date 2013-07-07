@@ -29,7 +29,7 @@ NSString * const kPlayerStatus      = @"status";
 
 KeepaliveInBg *g_instKeepalive = nil;
 
-@interface KeepaliveInBg () <AVAudioSessionDelegate>
+@interface KeepaliveInBg () <AVAudioPlayerDelegate>
 {
     NSString *_oldAudioCategory;
     UIBackgroundTaskIdentifier _bgtID;
@@ -63,6 +63,16 @@ KeepaliveInBg *g_instKeepalive = nil;
     if (self)
     {
         _bgtID = UIBackgroundTaskInvalid;
+        
+        // create the player
+        NSString *path = [self _path4mutedAudio];
+        if (path && [path length] > 0)
+        {
+            self.player = [[AVAudioPlayer alloc] initWithContentsOfURL:[NSURL URLWithString:path]
+                                                                 error:nil];
+            self.player.numberOfLoops = -1;
+            [self.player prepareToPlay];
+        }
     }
     
     return self;
@@ -91,6 +101,12 @@ KeepaliveInBg *g_instKeepalive = nil;
 #pragma mark private
 - (BOOL)_checkConfig
 {
+    // check if player is ready
+    if (!self.player)
+    {
+        return NO;
+    }
+    
     // check if the audio file exist
     if (![self _path4mutedAudio])
     {
@@ -132,11 +148,14 @@ KeepaliveInBg *g_instKeepalive = nil;
         return NO;
     }
     
-    if (self.player)
+    if (self.player.isPlaying)
     {
         return YES;
     }
     
+    NSAssert(self.player, @"ERROR");
+    
+    // hook
     UIApplication *app = instAPP;
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(_appBecameActive:)
@@ -149,6 +168,14 @@ KeepaliveInBg *g_instKeepalive = nil;
                                                  name:UIApplicationDidEnterBackgroundNotification
                                                object:nil];
     
+    // open background-task
+    [self _closeBackgroundTask];
+    _bgtID = [instAPP beginBackgroundTaskWithExpirationHandler:^{
+        KIBLOG(@"[beginBackgroundTaskWithExpirationHandler] ID:%d", _bgtID);
+        
+        [self _closeBackgroundTask];
+    }];
+    
     // setup audio session
     {
         NSError *err = nil;
@@ -156,13 +183,10 @@ KeepaliveInBg *g_instKeepalive = nil;
         NSAssert(!err, @"ERROR");
     }
     
-    // create the player
+    // turn on the mode if not active
+    if (UIApplicationStateActive != instAPP.applicationState)
     {
-        NSString *path = [self _path4mutedAudio];
-        self.player = [[AVAudioPlayer alloc] initWithContentsOfURL:[NSURL URLWithString:path]
-                                                             error:nil];
-        self.player.numberOfLoops = -1;
-        [self.player prepareToPlay];
+        [self performSelectorOnMainThread:@selector(_start) withObject:nil waitUntilDone:NO];
     }
     
     return (nil != self.player);
@@ -172,29 +196,28 @@ KeepaliveInBg *g_instKeepalive = nil;
 {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     [self _stop];
-    
-    self.player = nil;
 }
 
 - (void)_start
-{    
-    if (instAUDIOSession.delegate &&
-        instAUDIOSession.delegate != self)
+{   
+    if (self.player.delegate &&
+        self.player.delegate != self)
     {
         // FAIL because it's hooked by another code
         NSAssert(0, @"ERROR");
         return;
     }
     
-    if (self.enabled && !self.player.isPlaying)
+    if (self.enabled && self.player && !self.player.isPlaying)
     {
         KIBLOG(@"[_start]");
         [[NSNotificationCenter defaultCenter] postNotificationName:KeepaliveInBgWillBeginNotification
                                                             object:self
                                                           userInfo:nil];
         
+        // TODO: AVAudioSessionInterruptionNotification
         // monitor audio session
-        instAUDIOSession.delegate = self;
+        self.player.delegate = self;
         
         // enable background audio
         NSError *err = nil;
@@ -210,7 +233,7 @@ KeepaliveInBg *g_instKeepalive = nil;
 - (void)_stop
 {
     [self _disableMixed];
-    instAUDIOSession.delegate = nil;
+    self.player.delegate = nil;
     [self _closeBackgroundTask];
     
     if (_oldAudioCategory)
@@ -271,31 +294,22 @@ KeepaliveInBg *g_instKeepalive = nil;
 
 - (void)_appDidBackground:(NSNotification*)notify
 {
-    NSAssert(UIBackgroundTaskInvalid == _bgtID, @"ERROR");
-    [self _closeBackgroundTask];
-    
     if (!self.enabled)
     {
         return;
     }
     
-    _bgtID = [instAPP beginBackgroundTaskWithExpirationHandler:^{
-        KIBLOG(@"[beginBackgroundTaskWithExpirationHandler]");
-        
-        [self _closeBackgroundTask];
-    }];
-    
     KIBLOG(@"%s, background-task-id:%u", __FUNCTION__, (NSUInteger)_bgtID);
 }
 
-#pragma mark AVAudioSession
-- (void)beginInterruption
+#pragma mark AVAudioPlayerDelegate
+- (void)audioPlayerBeginInterruption:(AVAudioPlayer *)player;
 {
     KIBLOG(@"[beginInterruption]");
 }
 
 /* the interruption is over */
-- (void)endInterruptionWithFlags:(NSUInteger)flags
+- (void)audioPlayerEndInterruption:(AVAudioPlayer *)player withFlags:(NSUInteger)flags
 {
     KIBLOG(@"[endInterruptionWithFlags]");
     
