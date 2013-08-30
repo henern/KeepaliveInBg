@@ -68,8 +68,11 @@ KeepaliveInBg *g_instKeepalive = nil;
         NSString *path = [self _path4mutedAudio];
         if (path && [path length] > 0)
         {
-            self.player = [[AVAudioPlayer alloc] initWithContentsOfURL:[NSURL URLWithString:path]
-                                                                 error:nil];
+            NSData *audioData = [NSData dataWithContentsOfURL:[NSURL fileURLWithPath:path]];
+            // [[AVAudioPlayer alloc] initWithContentsOfURL:] not work on iOS 5.0,5.1
+            self.player = [[AVAudioPlayer alloc] initWithData:audioData
+                                                        error:nil];
+            NSAssert(self.player, @"ERROR");
             self.player.numberOfLoops = -1;
             [self.player prepareToPlay];
         }
@@ -306,6 +309,27 @@ KeepaliveInBg *g_instKeepalive = nil;
 - (void)audioPlayerBeginInterruption:(AVAudioPlayer *)player;
 {
     KIBLOG(@"[beginInterruption]");
+    
+    if (!self.enabled || instAPP.applicationState == UIApplicationStateActive)
+    {
+        NSAssert(0, @"Unexpected!");
+        [self _stop];       // stop it for safety!
+        return;
+    }
+    
+    if (!self.player.isPlaying)
+    {
+        // re-start
+        [self.player stop];
+        [self.player play];
+    }
+    
+    KIBLOG(@"[beginInterruption] restart the player, isplaying == %d", self.player.isPlaying);
+    if (!self.player.isPlaying)
+    {
+        NSAssert(0, @"Failed to restart audio playback!");
+        [self.player stop];     // stop the audio for safety!
+    }
 }
 
 /* the interruption is over */
